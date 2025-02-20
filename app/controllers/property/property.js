@@ -185,3 +185,4 @@ exports.searchProperties = async (req, res) => {
         res.status(500).json({ error: "Failed to fetch properties", details: error.message });
     }
 };
+
