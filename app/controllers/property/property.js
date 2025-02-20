@@ -88,7 +88,7 @@ exports.getPropertyById = async (req, res) => {
       res.status(500).json({ error: "Failed to fetch property", details: error.message });
   }
 };
-  
+
 exports.updateProperty = async (req, res) => {
     try {
       const { images: newImages, ...otherFields } = req.body;
@@ -185,3 +185,4 @@ exports.searchProperties = async (req, res) => {
         res.status(500).json({ error: "Failed to fetch properties", details: error.message });
     }
 };
+
