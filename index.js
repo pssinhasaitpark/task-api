@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
 
 const port = process.env.PORT || 8080;
 
-app.listen(port,() =>
+app.listen(port, () =>
   console.log(`App is listening at http://:${port}`)
 );
 
