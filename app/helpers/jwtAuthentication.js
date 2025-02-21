@@ -1,7 +1,7 @@
 const JWT = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const crypto = require('crypto');
-const { handleResponse } = require('./handleResponse'); 
+const { handleResponse } = require('./handleResponse');
 
 
 const generateToken = (userId, role, secret, expiresIn = '1h') => {
@@ -24,12 +24,9 @@ const generateToken = (userId, role, secret, expiresIn = '1h') => {
   });
 };
 
-
 const signAccessToken = (userId, role) => {
   return generateToken(userId, role, process.env.ACCESS_TOKEN_SECRET);
 };
-
-
 
 const signResetToken = (email) => {
   return new Promise((resolve, reject) => {
@@ -43,28 +40,27 @@ const signResetToken = (email) => {
   });
 };
 
-const encryptToken=(token) =>
-  {
- 
+const encryptToken = (token) => {
+
   const key = crypto.createHash('sha256').update(process.env.ACCESS_TOKEN_SECRET).digest();
 
-  const cipher = crypto.createCipheriv('aes-256-cbc', key, Buffer.from(process.env.ACCESS_TOKEN_SECRET).slice(0, 16));  
+  const cipher = crypto.createCipheriv('aes-256-cbc', key, Buffer.from(process.env.ACCESS_TOKEN_SECRET).slice(0, 16));
   let encrypted = cipher.update(token, 'utf8', 'hex');
   encrypted += cipher.final('hex');
   return encrypted;
 }
 
-const decryptToken=(encryptedToken)=>{
+const decryptToken = (encryptedToken) => {
   const key = crypto.createHash('sha256').update(process.env.ACCESS_TOKEN_SECRET).digest();
 
-  const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(process.env.ACCESS_TOKEN_SECRET).slice(0, 16));  
+  const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(process.env.ACCESS_TOKEN_SECRET).slice(0, 16));
   let decrypted = decipher.update(encryptedToken, 'hex', 'utf8');
   decrypted += decipher.final('utf8');
   return decrypted;
 }
 
 const verifyUser = async (req, res, next) => {
-  
+
   let encryptedToken = req.headers.authorization;
   if (!encryptedToken) {
     encryptedToken = req.query.token || req.body.token;
@@ -153,7 +149,6 @@ const verifySeller = async (req, res, next) => {
     return handleResponse(res, 401, "Unauthorized. Invalid token.");
   }
 };
-
 
 module.exports = {
   signAccessToken,

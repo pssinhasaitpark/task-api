@@ -1,11 +1,11 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const {jwtAuthentication} = require("../../helpers");
-const { emails} = require("../../helpers");
+const { jwtAuthentication } = require("../../helpers");
+const { emails } = require("../../helpers");
 const bcrypt = require("bcrypt");
 const JWT = require("jsonwebtoken");
 const { authVailidation } = require("../../joivalidators");
-const {handleResponse}=require("../../helpers/handleResponse")
+const { handleResponse } = require("../../helpers/handleResponse")
 
 
 exports.registerUser = async (req, res) => {
@@ -18,7 +18,7 @@ exports.registerUser = async (req, res) => {
     });
 
     if (existingUser) {
-      return handleResponse(res, 400,"User is already registered");
+      return handleResponse(res, 400, "User is already registered");
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -43,7 +43,7 @@ exports.registerUser = async (req, res) => {
     }
   }
 };
- 
+
 exports.loginUser = async (req, res) => {
   try {
     const result = await authVailidation.loginSchema.validateAsync(req.body);
@@ -61,43 +61,43 @@ exports.loginUser = async (req, res) => {
     if (!isValidPassword) {
       return handleResponse(res, 401, "Email/password is not valid");
     }
-   
-   if(existingUser.role_id===1){
-    const token=await jwtAuthentication.signAccessToken(existingUser.id, existingUser.role_id);
-    const encryptedToken = jwtAuthentication.encryptToken(token);
-    return handleResponse(res, 200, "Admin Dashboard", { encryptedToken });
-   }
+
+    if (existingUser.role_id === 1) {
+      const token = await jwtAuthentication.signAccessToken(existingUser.id, existingUser.role_id);
+      const encryptedToken = jwtAuthentication.encryptToken(token);
+      return handleResponse(res, 200, "Admin Dashboard", { encryptedToken });
+    }
 
 
-   else if(existingUser.role_id===2){
+    else if (existingUser.role_id === 2) {
+      const accessToken = await jwtAuthentication.signAccessToken(existingUser.id, existingUser.role_id);
+      const encryptedToken = jwtAuthentication.encryptToken(accessToken);
+      return handleResponse(res, 200, "Seller Dashboard", { encryptedToken });
+    }
+
+    else if (existingUser.role_id === 3) {
+      const accessToken = await jwtAuthentication.signAccessToken(existingUser.id, existingUser.role_id);
+      const encryptedToken = jwtAuthentication.encryptToken(accessToken);
+      return handleResponse(res, 200, "Builder Dashboard", { encryptedToken });
+    }
+
+    else if (existingUser.role_id === 4) {
+      const accessToken = await jwtAuthentication.signAccessToken(existingUser.id, existingUser.role_id);
+      const encryptedToken = jwtAuthentication.encryptToken(accessToken);
+      return handleResponse(res, 200, "Agent Dashboard", { encryptedToken });
+    }
+
+    else if (existingUser.role_id === 4) {
+      const accessToken = await jwtAuthentication.signAccessToken(existingUser.id, existingUser.role_id);
+      const encryptedToken = jwtAuthentication.encryptToken(accessToken);
+      return handleResponse(res, 200, "User Dashboard", { encryptedToken });
+    }
+
+
+
+
     const accessToken = await jwtAuthentication.signAccessToken(existingUser.id, existingUser.role_id);
     const encryptedToken = jwtAuthentication.encryptToken(accessToken);
-    return handleResponse(res, 200, "Seller Dashboard", { encryptedToken });
-   }
-
-   else if(existingUser.role_id===3){
-    const accessToken = await jwtAuthentication.signAccessToken(existingUser.id, existingUser.role_id);
-    const encryptedToken = jwtAuthentication.encryptToken(accessToken);
-    return handleResponse(res, 200, "Builder Dashboard", { encryptedToken });
-   }   
-
-   else if(existingUser.role_id===4){
-    const accessToken = await jwtAuthentication.signAccessToken(existingUser.id, existingUser.role_id);
-    const encryptedToken = jwtAuthentication.encryptToken(accessToken);
-    return handleResponse(res, 200, "Agent Dashboard", { encryptedToken });
-   }   
-
-   else if(existingUser.role_id===4){
-    const accessToken = await jwtAuthentication.signAccessToken(existingUser.id, existingUser.role_id);
-    const encryptedToken = jwtAuthentication.encryptToken(accessToken);
-    return handleResponse(res, 200, "User Dashboard", { encryptedToken });
-   }   
-     
-
-
-
-   const accessToken = await jwtAuthentication.signAccessToken(existingUser.id, existingUser.role_id);
-   const encryptedToken = jwtAuthentication.encryptToken(accessToken);
     return handleResponse(res, 200, "User Login successful", { token: encryptedToken });
 
 
@@ -110,7 +110,7 @@ exports.getAllUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
       include: {
-        role: {  
+        role: {
           select: {
             role: true,
           },
@@ -152,26 +152,25 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-
 exports.updateUser = async (req, res) => {
   try {
     const id = req.params.id;
     const userId = parseInt(id, 10);
-    const { email, password, mobileno,first_name,last_name} = req.body;
-    
+    const { email, password, mobileno, first_name, last_name } = req.body;
+
 
     let imageUrls = [];
-        if (req.files && req.files.length > 0) {
-          const uploadPromises = req.files.map((file) => cloudinary.uploadImageToCloudinary(file.buffer));
-          imageUrls = await Promise.all(uploadPromises);
-        }
-    
+    if (req.files && req.files.length > 0) {
+      const uploadPromises = req.files.map((file) => cloudinary.uploadImageToCloudinary(file.buffer));
+      imageUrls = await Promise.all(uploadPromises);
+    }
+
 
     if (!id) {
       console.error("Error executing query: Missing id");
       return handleResponse(res, 400, "Id is required.");
     }
-    
+
     const existingUser = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -189,8 +188,8 @@ exports.updateUser = async (req, res) => {
         email: email,
         password: hashPassword,
         mobileno: mobileno,
-        first_name:first_name,
-        last_name:last_name,
+        first_name: first_name,
+        last_name: last_name,
         image: imageUrls,
       },
     });
@@ -213,7 +212,7 @@ exports.deleteUser = async (req, res) => {
       console.error("Error executing query: Missing id");
       return handleResponse(res, 400, "Id is required.");
     }
-    
+
     const userId = parseInt(id, 10);
 
     const user = await prisma.user.findUnique({
@@ -255,7 +254,7 @@ exports.forgatePassword = async (req, res) => {
       return handleResponse(res, 404, "User is not registered");
     }
 
-    const resetToken = await jwtAuthentication.signResetToken(email);  
+    const resetToken = await jwtAuthentication.signResetToken(email);
     await emails.sendResetEmail(user.email, resetToken);
 
     return handleResponse(res, 200, "Password reset email sent successfully", { token: resetToken });

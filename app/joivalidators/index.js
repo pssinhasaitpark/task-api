@@ -1,5 +1,5 @@
 const authVailidation = require("./authValidation");
 
-module.exports = { 
-    authVailidation ,
+module.exports = {
+    authVailidation,
 };
